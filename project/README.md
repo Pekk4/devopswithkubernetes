@@ -16,5 +16,5 @@ docker run -it --rm todo_app
 Deploy in k8s with:
 
 ```bash
-kubectl create deployment todo_app --image=ghcr.io/pekk4/devopswithkubernetes-todo_app:1.2.
+kubectl apple -f manifests/deployment.yaml
 ```

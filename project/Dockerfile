@@ -11,6 +11,8 @@ FROM alpine:latest
 WORKDIR /app
 
 COPY --from=builder /app/todo_app .
+COPY ./static ./static
+COPY ./templates ./templates
 
 EXPOSE 3000
 

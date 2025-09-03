@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hello, world!</title>
+    <style>
+      #container {
+          margin: auto;
+          width: 70%;
+          margin-top: 150px;
+          text-align: center;
+      }
+      img {
+          width: 50%;
+      }
+      #button {
+          padding: 20px;
+          font-weight: bold;
+      }
+    </style>
+    <script>
+      function complete() {
+        const upper = document.getElementById("wrapper_upper");
+        const lower = document.getElementById("wrapper_lower");
+
+        upper.innerHTML = "<img src='../static/images/1884.webp'>";
+        lower.innerHTML = "<h1>Completed, the exercise is. Yeessssssss.</h1>";
+      }
+    </script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="wrapper_upper">
+        <button id="button" onclick="complete()">Press me!</button>
+      </div>
+      <div id="wrapper_lower">
+      </div>
+    </div>
+  </body>
+</html>
