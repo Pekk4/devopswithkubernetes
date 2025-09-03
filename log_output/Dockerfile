@@ -12,4 +12,6 @@ WORKDIR /app
 
 COPY --from=builder /app/log_app .
 
+EXPOSE 3000
+
 CMD ["./log_app"]

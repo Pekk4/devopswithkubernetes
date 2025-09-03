@@ -16,5 +16,9 @@ docker run -it --rm log_output_app
 Deploy in k8s with:
 
 ```bash
-kubectl create deployment log-output --image=ghcr.io/pekk4/devopswithkubernetes-log_output:1.1.
+kubectl apple -f manifests/deployment.yaml
 ```
+
+## Endpoints
+
+- `/status` - returns the string with current timestamp
