@@ -1,0 +1,40 @@
+name: Build & Publish Ping Pong App
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'ping-pong-app/VERSION'
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read version
+        id: version
+        run: echo "VERSION=$(cat ping-pong-app/VERSION)" >> $GITHUB_ENV
+
+      - name: Normalize repo name to lowercase
+        run: echo "REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Build & push Log output image
+        run: |
+          IMAGE=ghcr.io/${{ env.REPO }}-ping_pong_app:${{ env.VERSION }}
+          docker build -t $IMAGE -t ghcr.io/${{ env.REPO }}-ping_pong_app:latest --push ./ping-pong-app

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pingpong-app
+  labels:
+    app: pingpong-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pingpong-app
+  template:
+    metadata:
+      labels:
+        app: pingpong-app
+    spec:
+      containers:
+      - name: ping-pong-app
+        image: ghcr.io/pekk4/devopswithkubernetes-ping_pong_app:1.9
+        imagePullPolicy: Always
+        env:
+          - name: PORT
+            value: "8080"

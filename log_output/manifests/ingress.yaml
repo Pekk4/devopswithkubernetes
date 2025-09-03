@@ -13,3 +13,10 @@ spec:
             name: log-app-svc
             port:
               number: 666
+      - path: /pingpong
+        pathType: Prefix
+        backend:
+          service:
+            name: pingpong-service
+            port:
+              number: 80
