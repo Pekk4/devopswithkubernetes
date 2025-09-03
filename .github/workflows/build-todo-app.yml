@@ -2,6 +2,8 @@ name: Build & Publish Todo App
 
 on:
   push:
+    branches:
+      - main
     paths:
       - 'project/VERSION'
   workflow_dispatch:
