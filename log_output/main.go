@@ -34,12 +34,18 @@ func main() {
 		log.Println("Server started in port " + port)
 
 		http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
-			data, err := os.ReadFile("/logs/output.log")
+			log_data, err := os.ReadFile("/logs/output.log")
 			if err != nil {
 				http.Error(w, "Could not read a log file", http.StatusInternalServerError)
 				return
 			}
-			w.Write(data)
+			pong_data, err := os.ReadFile("/logs/pong.log")
+			if err != nil {
+				http.Error(w, "Could not read pong log file", http.StatusInternalServerError)
+				return
+			}
+			w.Write(log_data)
+			w.Write([]byte("Ping / pongs: " + string(pong_data)))
 		})
 
 		log.Fatal(http.ListenAndServe(":"+port, nil))

@@ -20,6 +20,12 @@ func pingPongHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "pong %d", count)
 
 	count++
+
+	f, err := os.OpenFile("/logs/pong.log", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err == nil {
+		defer f.Close()
+		fmt.Fprintf(f, "%d\n", count)
+	}
 }
 
 func main() {
@@ -30,7 +36,7 @@ func main() {
 
 	http.HandleFunc("/pingpong", pingPongHandler)
 
-	log.Println("Server started in port" + port)
+	log.Println("Server started in port " + port)
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
