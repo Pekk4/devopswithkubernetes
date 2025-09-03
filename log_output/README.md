@@ -22,3 +22,7 @@ kubectl apple -f manifests/deployment.yaml
 ## Endpoints
 
 - `/status` - returns the string with current timestamp
+
+## Configuration
+
+The app can run in two modes, determined by the `ROLE` environment variable. With `ROLE=writer` the app writes the timestamped random string into a log file, and without `ROLE` set it runs a web server that serves the log file content at the `/status` endpoint.

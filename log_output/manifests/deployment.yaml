@@ -13,6 +13,21 @@ spec:
         app: log-app
     spec:
       containers:
-        - name: log-app
-          image: ghcr.io/pekk4/devopswithkubernetes-log_output:1.7
+        - name: log-app-writer
+          image: ghcr.io/pekk4/devopswithkubernetes-log_output:1.10
           imagePullPolicy: Always
+          env:
+            - name: ROLE
+              value: "writer"
+          volumeMounts:
+            - name: log-output
+              mountPath: /logs
+        - name: log-app-server
+          image: ghcr.io/pekk4/devopswithkubernetes-log_output:1.10
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: log-output
+              mountPath: /logs
+      volumes:
+        - name: log-output
+          emptyDir: {}
