@@ -16,5 +16,5 @@ docker run -it --rm todo_app
 Deploy in k8s with:
 
 ```bash
-kubectl apple -f manifests/deployment.yaml
+kubectl apply -f manifests/
 ```

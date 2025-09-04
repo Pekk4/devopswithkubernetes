@@ -22,7 +22,7 @@
         const upper = document.getElementById("wrapper_upper");
         const lower = document.getElementById("wrapper_lower");
 
-        upper.innerHTML = "<img src='../static/images/1884.webp'>";
+        upper.innerHTML = "<img src='/static/image.jpg'>";
         lower.innerHTML = "<h1>Completed, the exercise is. Yeessssssss.</h1>";
       }
     </script>
@@ -30,9 +30,11 @@
   <body>
     <div id="container">
       <div id="wrapper_upper">
-        <button id="button" onclick="complete()">Press me!</button>
+        <h1>The project app</h1>
       </div>
       <div id="wrapper_lower">
+        <img src="/static/image_{{.ImageTS}}.jpg">
+        <h4>DevOps with Kubernetes 2025</h4>
       </div>
     </div>
   </body>

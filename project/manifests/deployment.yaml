@@ -14,8 +14,19 @@ spec:
     spec:
       containers:
         - name: todo-app
-          image: ghcr.io/pekk4/devopswithkubernetes-todo_app:1.5
+          image: ghcr.io/pekk4/devopswithkubernetes-todo_app:1.12
           imagePullPolicy: Always
           env:
             - name: PORT
               value: "8000"
+          volumeMounts:
+            - name: todo-storage
+              mountPath: /logs
+            - name: todo-storage
+              mountPath: /static
+      volumes:
+        - name: todo-storage
+          persistentVolumeClaim:
+            claimName: todo-app-pvc
+      nodeSelector:
+        kubernetes.io/hostname: k3d-k3s-default-agent-0
