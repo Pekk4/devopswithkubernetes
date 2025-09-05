@@ -29,12 +29,16 @@
   </head>
   <body>
     <div id="container">
-      <div id="wrapper_upper">
-        <h1>The project app</h1>
-      </div>
-      <div id="wrapper_lower">
-        <img src="/static/image_{{.ImageTS}}.jpg">
-        <h4>DevOps with Kubernetes 2025</h4>
+      <h1>The project app</h1>
+      <img src="/static/image_{{.ImageTS}}.jpg">
+      <div style="margin-top: 30px;">
+        <input type="text" maxlength="140">
+        <button>Create TODO</button>
+        <ul style="text-align: left;">
+          <li>✅ Learn Kubernetes basics</li>
+          <li>✅ Set up a cluster</li>
+          <li>⬜ Deploy the project app</li>
+        </ul>
       </div>
     </div>
   </body>
