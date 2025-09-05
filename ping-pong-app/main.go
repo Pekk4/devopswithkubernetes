@@ -35,6 +35,9 @@ func main() {
 	}
 
 	http.HandleFunc("/pingpong", pingPongHandler)
+	http.HandleFunc("/pings", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "%d", count)
+	})
 
 	log.Println("Server started in port " + port)
 

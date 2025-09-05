@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -8,6 +9,21 @@ import (
 
 	"github.com/google/uuid"
 )
+
+func getPongs() string {
+	resp, err := http.Get("http://pingpong-service:80/pings")
+	if err != nil {
+		return "Could not get pongs: " + err.Error()
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "Could not read response: " + err.Error()
+	}
+
+	return "Ping / pongs: " + string(body)
+}
 
 func main() {
 	s := uuid.New().String()
@@ -39,13 +55,9 @@ func main() {
 				http.Error(w, "Could not read a log file", http.StatusInternalServerError)
 				return
 			}
-			pong_data, err := os.ReadFile("/logs/pong.log")
-			if err != nil {
-				http.Error(w, "Could not read pong log file", http.StatusInternalServerError)
-				return
-			}
+			pong_data := getPongs()
 			w.Write(log_data)
-			w.Write([]byte("Ping / pongs: " + string(pong_data)))
+			w.Write([]byte(pong_data))
 		})
 
 		log.Fatal(http.ListenAndServe(":"+port, nil))

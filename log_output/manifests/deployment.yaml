@@ -16,7 +16,7 @@ spec:
         kubernetes.io/hostname: k3d-k3s-default-agent-0
       containers:
         - name: log-app-writer
-          image: ghcr.io/pekk4/devopswithkubernetes-log_output:1.11
+          image: ghcr.io/pekk4/devopswithkubernetes-log_output:2.1
           imagePullPolicy: Always
           env:
             - name: ROLE
@@ -25,7 +25,7 @@ spec:
             - name: log-output
               mountPath: /logs
         - name: log-app-server
-          image: ghcr.io/pekk4/devopswithkubernetes-log_output:1.11
+          image: ghcr.io/pekk4/devopswithkubernetes-log_output:2.1
           imagePullPolicy: Always
           volumeMounts:
             - name: log-output

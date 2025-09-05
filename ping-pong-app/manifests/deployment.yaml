@@ -18,15 +18,8 @@ spec:
         kubernetes.io/hostname: k3d-k3s-default-agent-0
       containers:
       - name: ping-pong-app
-        image: ghcr.io/pekk4/devopswithkubernetes-ping_pong_app:1.11
+        image: ghcr.io/pekk4/devopswithkubernetes-ping_pong_app:2.1
         imagePullPolicy: Always
         env:
           - name: PORT
             value: "8080"
-        volumeMounts:
-          - name: log-output
-            mountPath: /logs
-      volumes:
-        - name: log-output
-          persistentVolumeClaim:
-            claimName: pingpong-log-pvc
