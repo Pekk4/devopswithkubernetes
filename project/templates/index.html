@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Hello, world!</title>
+    <title>DevOps with K8s - ToDo App</title>
     <style>
       #container {
           margin: auto;
@@ -18,12 +18,26 @@
       }
     </style>
     <script>
-      function complete() {
-        const upper = document.getElementById("wrapper_upper");
-        const lower = document.getElementById("wrapper_lower");
+      async function addTodo() {
+        const input = document.getElementById("todo-input");
+        const text = input.value.trim();
+        const ul = document.getElementById("todo-list");
 
-        upper.innerHTML = "<img src='/static/image.jpg'>";
-        lower.innerHTML = "<h1>Completed, the exercise is. Yeessssssss.</h1>";
+        if (!text) return;
+        await fetch("/todos", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({text})
+        });
+        input.value = "";
+
+        if (ul.children.length === 1 && ul.children[0].textContent === "No todos yet!") {
+          ul.innerHTML = "";
+        }
+
+        const li = document.createElement("li");
+        li.textContent = text;
+        ul.appendChild(li);
       }
     </script>
   </head>
@@ -32,12 +46,14 @@
       <h1>The project app</h1>
       <img src="/static/image_{{.ImageTS}}.jpg">
       <div style="margin-top: 30px;">
-        <input type="text" maxlength="140">
-        <button>Create TODO</button>
-        <ul style="text-align: left;">
-          <li>✅ Learn Kubernetes basics</li>
-          <li>✅ Set up a cluster</li>
-          <li>⬜ Deploy the project app</li>
+        <input type="text" id="todo-input" maxlength="140" required>
+        <button onclick="addTodo()">Create TODO</button>
+        <ul id="todo-list" style="text-align: left;">
+          {{range .Todos}}
+            <li>{{.}}</li>
+          {{else}}
+            <li>No todos yet!</li>
+          {{end}}
         </ul>
       </div>
     </div>

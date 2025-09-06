@@ -14,11 +14,13 @@ spec:
     spec:
       containers:
         - name: todo-app
-          image: ghcr.io/pekk4/devopswithkubernetes-todo_app:1.12
+          image: ghcr.io/pekk4/devopswithkubernetes-todo_app:2.2
           imagePullPolicy: Always
           env:
             - name: PORT
               value: "8000"
+            - name: BACKEND_URL
+              value: "http://todo-backend-svc:3000"
           volumeMounts:
             - name: todo-storage
               mountPath: /logs

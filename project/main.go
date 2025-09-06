@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -12,7 +14,20 @@ import (
 var (
 	latestImageTimestamp time.Time
 	imageMutex           sync.Mutex
+	port                 string
+	backendBaseURL       string
 )
+
+func loadConfigFromENV() {
+	port = os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+	backendBaseURL = os.Getenv("BACKEND_URL")
+	if backendBaseURL == "" {
+		backendBaseURL = "http://localhost:3000"
+	}
+}
 
 func getImage() error {
 	resp, err := http.Get("https://picsum.photos/1200")
@@ -85,13 +100,37 @@ func handleImageProcedure() {
 	}
 }
 
-func main() {
-	go handleImageProcedure()
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3000"
+func getTodos() ([]string, error) {
+	resp, err := http.Get(backendBaseURL + "/todos")
+	if err != nil {
+		log.Println("Failed to fetch todos:", err)
+		return nil, err
 	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Failed to read todos response:", err)
+		return nil, err
+	}
+
+	var result struct {
+		Todos []string `json:"todos"`
+	}
+
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		log.Println("Failed to parse todos JSON:", err)
+		return nil, err
+	}
+
+	return result.Todos, nil
+}
+
+func main() {
+	loadConfigFromENV()
+
+	go handleImageProcedure()
 
 	log.Println("Server started in port " + port)
 
@@ -99,13 +138,22 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		todos, err := getTodos()
+		if err != nil {
+			log.Println("Error fetching todos:", err)
+		}
+
 		timestamp := latestImageTimestamp.Format("20060102150405")
 		tmpl, err := template.ParseFiles("templates/index.html")
 		if err != nil {
 			http.Error(w, "Template error", http.StatusInternalServerError)
 			return
 		}
-		tmpl.Execute(w, map[string]string{"ImageTS": timestamp})
+
+		tmpl.Execute(w, map[string]any{
+			"ImageTS": timestamp,
+			"Todos":   todos,
+		})
 
 		go handleImageProcedure()
 	})
