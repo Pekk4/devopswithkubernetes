@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'todo-backend/VERSION'
+      - 'project/todo-backend/VERSION'
   workflow_dispatch:
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
 
       - name: Read version
         id: version
-        run: echo "VERSION=$(cat todo-backend/VERSION)" >> $GITHUB_ENV
+        run: echo "VERSION=$(cat project/todo-backend/VERSION)" >> $GITHUB_ENV
 
       - name: Normalize repo name to lowercase
         run: echo "REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
@@ -37,4 +37,4 @@ jobs:
       - name: Build & push Log output image
         run: |
           IMAGE=ghcr.io/${{ env.REPO }}-todo_backend:${{ env.VERSION }}
-          docker build -t $IMAGE -t ghcr.io/${{ env.REPO }}-todo_backend:latest --push ./todo-backend
+          docker build -t $IMAGE -t ghcr.io/${{ env.REPO }}-todo_backend:latest --push ./project/todo-backend

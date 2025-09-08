@@ -51,9 +51,11 @@ async fn main() {
                 .allow_headers(Any)
         );
 
-    let listener = TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let port = std::env::var("PORT").expect("Environment variable PORT is required");
+    let addr = format!("0.0.0.0:{}", port);
+    let listener = TcpListener::bind(&addr).await.unwrap();
 
-    println!("Server started in port 3000");
+    println!("Server started in port {}", port);
 
     axum::serve(listener, app).await.unwrap();
 }

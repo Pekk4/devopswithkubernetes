@@ -15,5 +15,8 @@ spec:
     spec:
       containers:
         - name: todo-backend
-          image: ghcr.io/pekk4/devopswithkubernetes-todo_backend:2.2
+          image: ghcr.io/pekk4/devopswithkubernetes-todo_backend:2.6
           imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "3000"

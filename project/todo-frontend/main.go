@@ -21,11 +21,11 @@ var (
 func loadConfigFromENV() {
 	port = os.Getenv("PORT")
 	if port == "" {
-		port = "3000"
+		log.Fatal("PORT environment variable is required")
 	}
 	backendBaseURL = os.Getenv("BACKEND_URL")
 	if backendBaseURL == "" {
-		backendBaseURL = "http://localhost:3000"
+		log.Fatal("BACKEND_URL environment variable is required")
 	}
 }
 

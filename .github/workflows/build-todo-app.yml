@@ -1,11 +1,11 @@
-name: Build & Publish Todo App
+name: Build & Publish Todo App Frontend
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'project/VERSION'
+      - 'project/todo-frontend/VERSION'
   workflow_dispatch:
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
 
       - name: Read version
         id: version
-        run: echo "VERSION=$(cat project/VERSION)" >> $GITHUB_ENV
+        run: echo "VERSION=$(cat project/todo-frontend/VERSION)" >> $GITHUB_ENV
 
       - name: Normalize repo name to lowercase
         run: echo "REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
@@ -37,4 +37,4 @@ jobs:
       - name: Build & push Log output image
         run: |
           IMAGE=ghcr.io/${{ env.REPO }}-todo_app:${{ env.VERSION }}
-          docker build -t $IMAGE -t ghcr.io/${{ env.REPO }}-todo_app:latest --push ./project
+          docker build -t $IMAGE -t ghcr.io/${{ env.REPO }}-todo_app:latest --push ./project/todo-frontend
