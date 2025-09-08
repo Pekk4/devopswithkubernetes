@@ -17,7 +17,7 @@ spec:
         kubernetes.io/hostname: k3d-k3s-default-agent-0
       containers:
         - name: log-app-writer
-          image: ghcr.io/pekk4/devopswithkubernetes-log_output:2.1
+          image: ghcr.io/pekk4/devopswithkubernetes-log_output:2.5
           imagePullPolicy: Always
           env:
             - name: ROLE
@@ -26,12 +26,23 @@ spec:
             - name: log-output
               mountPath: /logs
         - name: log-app-server
-          image: ghcr.io/pekk4/devopswithkubernetes-log_output:2.1
+          image: ghcr.io/pekk4/devopswithkubernetes-log_output:2.5
           imagePullPolicy: Always
           volumeMounts:
             - name: log-output
               mountPath: /logs
+            - name: information
+              mountPath: /information
+          env:
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: log-app-configmap
+                  key: MESSAGE
       volumes:
         - name: log-output
           persistentVolumeClaim:
             claimName: pingpong-log-pvc
+        - name: information
+          configMap:
+            name: log-app-configmap
