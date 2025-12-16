@@ -1,15 +1,29 @@
+mod db;
+
 use axum::{
     extract::{State, Json},
-    routing::{get, post},
+    routing::{get},
     Router,
     response::IntoResponse,
+    http::StatusCode
 };
 use serde::{Deserialize, Serialize};
 use std::{sync::{Arc, Mutex}};
 use tokio::net::TcpListener;
+use tokio::task::spawn_blocking;
 use tower_http::cors::{CorsLayer, Any};
+use db::TodoStore;
 
-type TodoList = Arc<Mutex<Vec<String>>>;
+#[derive(Clone)]
+struct Config {
+    db_creds: String,
+    port: u16,
+}
+
+#[derive(Clone)]
+struct AppState {
+    db: Arc<Mutex<TodoStore>>,
+}
 
 #[derive(Deserialize)]
 struct NewTodo {
@@ -21,29 +35,76 @@ struct TodosResponse {
     todos: Vec<String>,
 }
 
-async fn get_todos(State(todos): State<TodoList>) -> impl IntoResponse {
-    let todos = todos.lock().unwrap();
-    axum::Json(TodosResponse {
-        todos: todos.clone(),
-    })
+#[derive(Serialize)]
+struct TodoResponse {
+    todo: String,
 }
 
-async fn add_todo(
-    State(todos): State<TodoList>,
-    Json(payload): Json<NewTodo>,
-) -> impl IntoResponse {
-    let mut todos = todos.lock().unwrap();
-    todos.push(payload.text);
-    "Todo added"
+async fn get_todos(State(state): State<AppState>) -> impl IntoResponse {
+    let db = state.db.clone();
+    let res = spawn_blocking(move || {
+        let mut guard = db.lock().unwrap();
+        guard.list_todos().map_err(|e| format!("{}", e))
+    })
+    .await;
+
+    match res {
+        Ok(Ok(todos)) => {
+            let todos: Vec<String> = todos.into_iter().map(|(_, todo)| todo).collect();
+            Json(TodosResponse { todos }).into_response()
+        }
+        Ok(Err(e)) => (StatusCode::INTERNAL_SERVER_ERROR, format!("db error: {}", e)).into_response(),
+        Err(_) => (StatusCode::INTERNAL_SERVER_ERROR, "join error").into_response(),
+    }
+}
+
+async fn add_todo(State(state): State<AppState>, Json(payload): Json<NewTodo>) -> impl IntoResponse {
+    let db = state.db.clone();
+    let todo_text = payload.text.clone();
+    let res = spawn_blocking(move || {
+        let mut guard = db.lock().unwrap();
+        guard.insert_todo(&todo_text).map_err(|e| format!("{}", e))
+    })
+    .await;
+
+    match res {
+        Ok(Ok(inserted)) => (
+            StatusCode::CREATED,
+            Json(TodoResponse { todo: inserted })
+        ).into_response(),
+        Ok(Err(e)) => (StatusCode::INTERNAL_SERVER_ERROR, format!("db error: {}", e)).into_response(),
+        Err(_) => (StatusCode::INTERNAL_SERVER_ERROR, "join error").into_response(),
+    }
+}
+
+fn init() -> Config {
+    let db_creds = std::env::var("PG_URL")
+        .expect("variable PG_URL is not set");
+    let port = std::env::var("PORT")
+        .unwrap_or_else(|_| "3000".into())
+        .parse()
+        .expect("PORT must be a number");
+
+    Config { db_creds, port }
 }
 
 #[tokio::main]
 async fn main() {
-    let todos: TodoList = Arc::new(Mutex::new(Vec::new()));
+    let config = init();
+
+    let db = spawn_blocking(move || {
+        let mut store = TodoStore::new(&config.db_creds).expect("db connect");
+        store.init().expect("db init");
+        Arc::new(Mutex::new(store))
+    })
+    .await
+    .expect("db init join");
+
+    let state = AppState { db };
 
     let app = Router::new()
         .route("/todos", get(get_todos).post(add_todo))
-        .with_state(todos)
+        .with_state(state)
         .layer(
             CorsLayer::new()
                 .allow_origin(Any)
@@ -51,11 +112,10 @@ async fn main() {
                 .allow_headers(Any)
         );
 
-    let port = std::env::var("PORT").expect("Environment variable PORT is required");
-    let addr = format!("0.0.0.0:{}", port);
+    let addr = format!("0.0.0.0:{}", config.port);
     let listener = TcpListener::bind(&addr).await.unwrap();
 
-    println!("Server started in port {}", port);
+    println!("Server started in port {}", config.port);
 
     axum::serve(listener, app).await.unwrap();
 }
