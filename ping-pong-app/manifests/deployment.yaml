@@ -19,8 +19,10 @@ spec:
         kubernetes.io/hostname: k3d-k3s-default-agent-0
       containers:
       - name: ping-pong-app
-        image: ghcr.io/pekk4/devopswithkubernetes-ping_pong_app:2.1
+        image: ghcr.io/pekk4/devopswithkubernetes-ping_pong_app:2.7
         imagePullPolicy: Always
         env:
           - name: PORT
             value: "8080"
+          - name: PG_URL
+            value: "postgres://pingpong:pingpong@pingpong-postgres:5432/pingpong?sslmode=disable"
