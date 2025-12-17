@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: create-todo-hourly
+  namespace: project
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: create-todo
+            image: alpine:latest
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                apk add --no-cache curl &&
+                url=$(curl -sI https://en.wikipedia.org/wiki/Special:Random | grep -i '^location:' | awk '{print $2}' | tr -d '\r\n') &&
+                printf '{"text":"Read %s"}' "$url" | curl -X POST -H "Content-Type: application/json" --data @- http://todo-backend-svc:3000/todos
+          restartPolicy: OnFailure
