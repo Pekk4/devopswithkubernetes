@@ -40,6 +40,11 @@ struct TodoResponse {
     todo: String,
 }
 
+#[derive(Serialize)]
+struct ErrorResponse {
+    error: String,
+}
+
 async fn get_todos(State(state): State<AppState>) -> impl IntoResponse {
     let db = state.db.clone();
     let res = spawn_blocking(move || {
@@ -61,6 +66,18 @@ async fn get_todos(State(state): State<AppState>) -> impl IntoResponse {
 async fn add_todo(State(state): State<AppState>, Json(payload): Json<NewTodo>) -> impl IntoResponse {
     let db = state.db.clone();
     let todo_text = payload.text.clone();
+
+    if todo_text.chars().count() > 140 {
+        println!("Todo text exceeds 140 characters: {}", todo_text);
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(ErrorResponse {
+                error: "Todo text exceeds 140 characters".to_string(),
+            }),
+        )
+        .into_response();
+    }
+
     let res = spawn_blocking(move || {
         let mut guard = db.lock().unwrap();
         guard.insert_todo(&todo_text).map_err(|e| format!("{}", e))
