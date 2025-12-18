@@ -80,6 +80,10 @@ func main() {
 			w.Write([]byte(log_data))
 			w.Write([]byte(pong_data))
 		})
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("Frostyyy, the snowman..."))
+		})
 
 		log.Fatal(http.ListenAndServe(":"+port, nil))
 	}

@@ -5,9 +5,7 @@ metadata:
   namespace: exercises
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
-  volumeName: pingpong-log-pv
-  storageClassName: pingpong-log-pv

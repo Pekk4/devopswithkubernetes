@@ -77,6 +77,10 @@ func main() {
 		}
 		fmt.Fprintf(w, "%d", result)
 	})
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Alles gut"))
+	})
 
 	log.Println("Server started in port " + port)
 

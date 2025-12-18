@@ -4,7 +4,7 @@ metadata:
   name: log-app-svc
   namespace: exercises
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: log-app
   ports:
