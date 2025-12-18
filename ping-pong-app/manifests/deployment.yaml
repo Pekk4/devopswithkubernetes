@@ -15,8 +15,6 @@ spec:
       labels:
         app: pingpong-app
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: k3d-k3s-default-agent-0
       containers:
       - name: ping-pong-app
         image: ghcr.io/pekk4/devopswithkubernetes-ping_pong_app:2.7
