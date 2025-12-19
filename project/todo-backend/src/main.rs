@@ -94,6 +94,10 @@ async fn add_todo(State(state): State<AppState>, Json(payload): Json<NewTodo>) -
     }
 }
 
+async fn health_check() -> StatusCode {
+    StatusCode::OK
+}
+
 fn init() -> Config {
     let db_creds = std::env::var("PG_URL")
         .expect("variable PG_URL is not set");
@@ -120,6 +124,7 @@ async fn main() {
     let state = AppState { db };
 
     let app = Router::new()
+        .route("/", get(health_check))
         .route("/todos", get(get_todos).post(add_todo))
         .with_state(state)
         .layer(

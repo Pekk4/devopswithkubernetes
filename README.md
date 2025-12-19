@@ -37,3 +37,4 @@
 - [3.2.](https://github.com/Pekk4/devopswithkubernetes/tree/3.2)
 - [3.3.](https://github.com/Pekk4/devopswithkubernetes/tree/3.3)
 - [3.4.](https://github.com/Pekk4/devopswithkubernetes/tree/3.4/ping-pong-app)
+- [3.5.](https://github.com/Pekk4/devopswithkubernetes/tree/3.5/project)
