@@ -67,19 +67,14 @@ func main() {
 		}
 	}()
 
-	http.HandleFunc("/pingpong", pingPongHandler)
+	http.HandleFunc("/", pingPongHandler)
 	http.HandleFunc("/pings", func(w http.ResponseWriter, r *http.Request) {
-		//fmt.Fprintf(w, "%d", count)
 		result, err := store.GetCounts(ctx)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("failed to get counts: %result", err), http.StatusInternalServerError)
 			return
 		}
 		fmt.Fprintf(w, "%d", result)
-	})
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Alles gut"))
 	})
 
 	log.Println("Server started in port " + port)
