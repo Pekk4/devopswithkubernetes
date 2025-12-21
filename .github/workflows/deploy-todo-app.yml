@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - '*'
     paths:
       - 'project/**'
       - '.github/workflows/deploy-todo-app.yml'
@@ -51,9 +52,20 @@ jobs:
 
       - name: Deploy with Kustomize
         run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          if [ "$BRANCH_NAME" = "main" ]; then
+            NAMESPACE="project"
+          else
+            NAMESPACE=$BRANCH_NAME
+          fi
+          echo "Using namespace: $NAMESPACE"
+          kubectl create namespace $NAMESPACE || true
+          kubectl config set-context --current --namespace=$NAMESPACE
           cd project
+          kustomize edit set namespace $NAMESPACE
           kustomize edit set image ghcr.io/pekk4/devopswithkubernetes-todo_backend=ghcr.io/pekk4/devopswithkubernetes-todo_backend:${{ env.BACKEND_VERSION }}
           kustomize edit set image ghcr.io/pekk4/devopswithkubernetes-todo_frontend=ghcr.io/pekk4/devopswithkubernetes-todo_frontend:${{ env.FRONTEND_VERSION }}
           kubectl apply -k .
-          kubectl rollout status deployment/todo-backend -n project
-          kubectl get services -o wide -n project
+          kubectl rollout status deployment/todo-backend
+          kubectl rollout status deployment/todo-app
+          kubectl get services -o wide
