@@ -1,0 +1,59 @@
+name: Deploy Todo App (Project)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'project/**'
+      - '.github/workflows/deploy-todo-app.yml'
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-north1-b
+
+jobs:
+  deploy:
+    name: Deploy to GKE
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GKE_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Get GKE Credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          project_id: ${{ env.PROJECT_ID }}
+          location: ${{ env.GKE_ZONE }}
+
+      - name: Read backend version
+        id: backend_version
+        run: echo "BACKEND_VERSION=$(cat project/todo-backend/VERSION)" >> $GITHUB_ENV
+
+      - name: Read frontend version
+        id: frontend_version
+        run: echo "FRONTEND_VERSION=$(cat project/todo-frontend/VERSION)" >> $GITHUB_ENV
+
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v2
+
+      - name: Deploy with Kustomize
+        run: |
+          cd project
+          kustomize edit set image ghcr.io/pekk4/devopswithkubernetes-todo_backend=ghcr.io/pekk4/devopswithkubernetes-todo_backend:${{ env.BACKEND_VERSION }}
+          kustomize edit set image ghcr.io/pekk4/devopswithkubernetes-todo_frontend=ghcr.io/pekk4/devopswithkubernetes-todo_frontend:${{ env.FRONTEND_VERSION }}
+          kubectl apply -k .
+          kubectl rollout status deployment/todo-backend -n project
+          kubectl get services -o wide -n project
