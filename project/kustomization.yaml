@@ -14,6 +14,7 @@ resources:
   - todo-backend/manifests/service.yaml
   - todo-backend/manifests/http-route.yaml
   - todo-backend/manifests/cronjob-create-todo.yaml
+  - todo-backend/manifests/cronjob-postgres-backup.yaml
 
 images:
   - name: ghcr.io/pekk4/devopswithkubernetes-todo_backend
