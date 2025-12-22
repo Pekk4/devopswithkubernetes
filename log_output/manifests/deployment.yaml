@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: log-app-writer
-          image: ghcr.io/pekk4/devopswithkubernetes-log_output:3.2
+          image: ghcr.io/pekk4/devopswithkubernetes-log_output:4.1
           imagePullPolicy: Always
           env:
             - name: ROLE
@@ -23,8 +23,15 @@ spec:
           volumeMounts:
             - name: log-output
               mountPath: /logs
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "20m"
+            limits:
+              memory: "64Mi"
+              cpu: "50m"
         - name: log-app-server
-          image: ghcr.io/pekk4/devopswithkubernetes-log_output:3.2
+          image: ghcr.io/pekk4/devopswithkubernetes-log_output:4.1
           imagePullPolicy: Always
           volumeMounts:
             - name: log-output
@@ -37,6 +44,19 @@ spec:
                 configMapKeyRef:
                   name: log-app-configmap
                   key: MESSAGE
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "20m"
+            limits:
+              memory: "64Mi"
+              cpu: "50m"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
       volumes:
         - name: log-output
           persistentVolumeClaim:

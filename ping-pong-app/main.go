@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"time"
 )
 
 var (
@@ -38,6 +39,16 @@ func pingPongHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func healthzHandler(w http.ResponseWriter, _ *http.Request) {
+	if err := store.Ping(); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+}
+
 func initSession() {
 	port = os.Getenv("PORT")
 	if port == "" {
@@ -49,10 +60,21 @@ func initSession() {
 	}
 
 	var err error
-	store, err = NewCounterStore(db_creds)
-	if err != nil {
-		log.Fatalf("failed to connect to DB: %v", err)
+
+	for i := 0; i < 15; i++ {
+		store, err = NewCounterStore(db_creds)
+		if err == nil {
+			break
+		}
+		log.Printf("Failed to connect to DB (attempt %d/15): %v. Retrying...", i+1, err)
+
+		time.Sleep(time.Duration(i) * time.Second)
 	}
+
+	if err != nil {
+		log.Fatalf("failed to connect to DB after retries: %v", err)
+	}
+
 	ctx = context.Background()
 	if err := store.Init(ctx); err != nil {
 		log.Fatalf("failed to initialize DB: %v", err)
@@ -68,10 +90,11 @@ func main() {
 	}()
 
 	http.HandleFunc("/", pingPongHandler)
+	http.HandleFunc("/healthz", healthzHandler)
 	http.HandleFunc("/pings", func(w http.ResponseWriter, r *http.Request) {
 		result, err := store.GetCounts(ctx)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("failed to get counts: %result", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("failed to get counts: %v", err), http.StatusInternalServerError)
 			return
 		}
 		fmt.Fprintf(w, "%d", result)

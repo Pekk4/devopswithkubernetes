@@ -52,3 +52,7 @@ func (s *CounterStore) GetCounts(ctx context.Context) (int64, error) {
 	err := s.db.QueryRowContext(ctx, "SELECT id FROM pingpong_counter ORDER BY id DESC LIMIT 1").Scan(&v)
 	return v, err
 }
+
+func (s *CounterStore) Ping() error {
+	return s.db.Ping()
+}

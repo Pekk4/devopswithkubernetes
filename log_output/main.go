@@ -43,6 +43,18 @@ func getFileContent() string {
 	return "File content: " + string(data)
 }
 
+func healthzHandler(w http.ResponseWriter, _ *http.Request) {
+	resp, err := http.Get("http://pingpong-service:80/healthz")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+}
+
 func main() {
 	s := uuid.New().String()
 
@@ -84,6 +96,7 @@ func main() {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte("Frostyyy, the snowman..."))
 		})
+		http.HandleFunc("/healthz", healthzHandler)
 
 		log.Fatal(http.ListenAndServe(":"+port, nil))
 	}
