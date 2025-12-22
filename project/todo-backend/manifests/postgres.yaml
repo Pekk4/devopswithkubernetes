@@ -33,6 +33,13 @@ spec:
         - name: postgres-data
           mountPath: /var/lib/postgresql/data
           subPath: postgres
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "300m"
   volumeClaimTemplates:
   - metadata:
       name: postgres-data

@@ -28,6 +28,13 @@ spec:
         - name: todo-backend
           image: ghcr.io/pekk4/devopswithkubernetes-todo_backend
           imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "20m"
+            limits:
+              memory: "64Mi"
+              cpu: "50m"
           env:
             - name: PORT
               value: "3000"
