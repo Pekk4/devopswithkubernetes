@@ -45,4 +45,10 @@ impl TodoStore {
         }
         Ok(out)
     }
+
+    pub fn ping(&mut self) -> Result<(), String> {
+        self.client.query("SELECT 1", &[])
+            .map(|_| ())
+            .map_err(|e| e.to_string())
+    }
 }

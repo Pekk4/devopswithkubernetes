@@ -18,8 +18,8 @@ resources:
 
 images:
   - name: ghcr.io/pekk4/devopswithkubernetes-todo_backend
-    newTag: "3.5"
-  - name: ghcr.io/pekk4/devopswithkubernetes-todo_frontend
-    newTag: "2.8"
+    newTag: "4.2"
+  - name: ghcr.io/pekk4/devopswithkubernetes-todo_app
+    newTag: "4.2"
   - name: postgres
     newTag: "15"

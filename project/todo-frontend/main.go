@@ -127,6 +127,18 @@ func getTodos() ([]string, error) {
 	return result.Todos, nil
 }
 
+func healthzHandler(w http.ResponseWriter, _ *http.Request) {
+	resp, err := http.Get(backendBaseURL + "/healthz")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+}
+
 func main() {
 	loadConfigFromENV()
 
@@ -157,6 +169,7 @@ func main() {
 
 		go handleImageProcedure()
 	})
+	http.HandleFunc("/healthz", healthzHandler)
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

@@ -94,8 +94,18 @@ async fn add_todo(State(state): State<AppState>, Json(payload): Json<NewTodo>) -
     }
 }
 
-async fn health_check() -> StatusCode {
-    StatusCode::OK
+async fn health_check(State(state): State<AppState>) -> StatusCode {
+    let db = state.db.clone();
+    let res = spawn_blocking(move || {
+        let mut guard = db.lock().unwrap();
+        guard.ping()
+    })
+    .await;
+
+    match res {
+        Ok(Ok(_)) => StatusCode::OK,
+        _ => StatusCode::INTERNAL_SERVER_ERROR,
+    }
 }
 
 fn init() -> Config {
@@ -124,7 +134,7 @@ async fn main() {
     let state = AppState { db };
 
     let app = Router::new()
-        .route("/", get(health_check))
+        .route("/healthz", get(health_check))
         .route("/todos", get(get_todos).post(add_todo))
         .with_state(state)
         .layer(
