@@ -51,3 +51,4 @@
 - [4.2.](https://github.com/Pekk4/devopswithkubernetes/tree/4.2/project)
 - [4.3.](https://github.com/Pekk4/devopswithkubernetes/tree/4.3/images)
 - [4.4.](https://github.com/Pekk4/devopswithkubernetes/tree/4.4/ping-pong-app)
+- [4.5.](https://github.com/Pekk4/devopswithkubernetes/tree/4.5/project)

@@ -16,7 +16,8 @@ impl TodoStore {
             "
               CREATE TABLE IF NOT EXISTS todos (
                   id SERIAL PRIMARY KEY,
-                  todo TEXT NOT NULL
+                  todo TEXT NOT NULL,
+                  done BOOLEAN NOT NULL DEFAULT FALSE
               );
             ",
         )?;
@@ -33,17 +34,26 @@ impl TodoStore {
         Ok(inserted)
     }
 
-    pub fn list_todos(&mut self) -> Result<Vec<(i32, String)>, Box<dyn Error>> {
+    pub fn list_todos(&mut self) -> Result<Vec<(i32, String, bool)>, Box<dyn Error>> {
         let rows = self
             .client
-            .query("SELECT id, todo FROM todos ORDER BY id", &[])?;
-        let mut out = Vec::with_capacity(rows.len());
+            .query("SELECT id, todo, done FROM todos ORDER BY id", &[])?;
+        let mut todos = Vec::with_capacity(rows.len());
         for row in rows {
             let id: i32 = row.get(0);
             let todo: String = row.get(1);
-            out.push((id, todo));
+            let done: bool = row.get(2);
+            todos.push((id, todo, done));
         }
-        Ok(out)
+        Ok(todos)
+    }
+
+    pub fn update_todo_status(&mut self, id: i32, done: bool) -> Result<String, Box<dyn Error>> {
+        let query = "UPDATE todos SET done = $1 WHERE id = $2 RETURNING todo";
+        let row = self.client.query_one(query, &[&done, &id])?;
+        let updated: String = row.get(0);
+        println!("Updated todo: '{}' to be done", updated);
+        Ok(updated)
     }
 
     pub fn ping(&mut self) -> Result<(), String> {

@@ -18,6 +18,12 @@ var (
 	backendBaseURL       string
 )
 
+type TodoItem struct {
+	Todo string `json:"todo"`
+	ID   int    `json:"id"`
+	Done bool   `json:"done"`
+}
+
 func loadConfigFromENV() {
 	port = os.Getenv("PORT")
 	if port == "" {
@@ -100,7 +106,7 @@ func handleImageProcedure() {
 	}
 }
 
-func getTodos() ([]string, error) {
+func getTodos() ([]TodoItem, error) {
 	resp, err := http.Get(backendBaseURL + "/todos")
 	if err != nil {
 		log.Println("Failed to fetch todos:", err)
@@ -115,7 +121,7 @@ func getTodos() ([]string, error) {
 	}
 
 	var result struct {
-		Todos []string `json:"todos"`
+		Todos []TodoItem `json:"todos"`
 	}
 
 	err = json.Unmarshal(body, &result)

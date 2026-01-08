@@ -1,8 +1,8 @@
 mod db;
 
 use axum::{
-    extract::{State, Json},
-    routing::{get},
+    extract::{State, Json, Path},
+    routing::{get, put},
     Router,
     response::IntoResponse,
     http::StatusCode
@@ -31,8 +31,16 @@ struct NewTodo {
 }
 
 #[derive(Serialize)]
+struct TodoItem {
+    id: i32,
+    todo: String,
+    done: bool,
+}
+
+
+#[derive(Serialize)]
 struct TodosResponse {
-    todos: Vec<String>,
+    todos: Vec<TodoItem>,
 }
 
 #[derive(Serialize)]
@@ -55,8 +63,15 @@ async fn get_todos(State(state): State<AppState>) -> impl IntoResponse {
 
     match res {
         Ok(Ok(todos)) => {
-            let todos: Vec<String> = todos.into_iter().map(|(_, todo)| todo).collect();
-            Json(TodosResponse { todos }).into_response()
+            let todo_items: Vec<TodoItem> = todos
+                .into_iter()
+                .map(|(id, text, done)| TodoItem {
+                    id,
+                    todo: text,
+                    done
+                })
+                .collect();
+            Json(TodosResponse { todos: todo_items }).into_response()
         }
         Ok(Err(e)) => (StatusCode::INTERNAL_SERVER_ERROR, format!("db error: {}", e)).into_response(),
         Err(_) => (StatusCode::INTERNAL_SERVER_ERROR, "join error").into_response(),
@@ -108,6 +123,31 @@ async fn health_check(State(state): State<AppState>) -> StatusCode {
     }
 }
 
+async fn update_todo(
+    State(state): State<AppState>,
+    Path(id): Path<i32>,
+) -> impl IntoResponse {
+    println!("Trying updating todo with id: {}", id);
+    let db = state.db.clone();
+    let res = spawn_blocking(move || {
+        let mut guard = db.lock().unwrap();
+        guard.update_todo_status(id, true).map_err(|e| format!("{}", e))
+    })
+    .await;
+
+    match res {
+        Ok(Ok(updated_text)) => (
+            StatusCode::OK,
+            Json(TodoResponse { todo: updated_text })
+        ).into_response(),
+        Ok(Err(e)) => {
+            println!("Failed to update todo: {}", e);
+            (StatusCode::NOT_FOUND, "Todo not found").into_response()
+        },
+        Err(_) => (StatusCode::INTERNAL_SERVER_ERROR, "join error").into_response(),
+    }
+}
+
 fn init() -> Config {
     let db_creds = std::env::var("PG_URL")
         .expect("variable PG_URL is not set");
@@ -136,6 +176,7 @@ async fn main() {
     let app = Router::new()
         .route("/healthz", get(health_check))
         .route("/todos", get(get_todos).post(add_todo))
+        .route("/todos/:id", put(update_todo))
         .with_state(state)
         .layer(
             CorsLayer::new()
