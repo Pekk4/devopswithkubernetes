@@ -1,13 +1,6 @@
 name: Deploy Todo App (Project)
 
 on:
-  push:
-    branches:
-      - main
-      - '*'
-    paths:
-      - 'project/**'
-      - '.github/workflows/deploy-todo-app.yml'
   workflow_dispatch:
 
 env:
