@@ -1,0 +1,45 @@
+name: Update Todo App Manifests
+
+on:
+  workflow_run:
+    workflows: 
+      - "Build & Publish Todo App Frontend"
+      - "Build & Publish Todo Backend"
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  update-kustomization-yaml:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read backend version
+        id: backend_version
+        run: echo "BACKEND_VERSION=$(cat project/todo-backend/VERSION)" >> $GITHUB_ENV
+
+      - name: Read frontend version
+        id: frontend_version
+        run: echo "FRONTEND_VERSION=$(cat project/todo-frontend/VERSION)" >> $GITHUB_ENV
+
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v2
+
+      - name: Update Image Tags
+        run: |
+          cd project
+          kustomize edit set image ghcr.io/pekk4/devopswithkubernetes-todo_backend=ghcr.io/pekk4/devopswithkubernetes-todo_backend:${{ env.BACKEND_VERSION }}
+          kustomize edit set image ghcr.io/pekk4/devopswithkubernetes-todo_app=ghcr.io/pekk4/devopswithkubernetes-todo_app:${{ env.FRONTEND_VERSION }}
+
+      - name: Commit and Push
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: 'project/kustomization.yaml'
+          message: 'Update kustomization.yaml with latest versions'
