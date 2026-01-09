@@ -13,4 +13,4 @@ resources:
 images:
 - name: ghcr.io/pekk4/devopswithkubernetes-log_output
   newName: ghcr.io/pekk4/devopswithkubernetes-log_output
-  newTag: 4.1.1
+  newTag: 4.1.2
