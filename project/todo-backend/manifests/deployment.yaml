@@ -45,13 +45,13 @@ spec:
                   key: PG_URL
           readinessProbe:
             httpGet:
-              path: /healthz
+              path: /
               port: 3000
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /healthz
+              path: /
               port: 3000
             initialDelaySeconds: 20
             periodSeconds: 20

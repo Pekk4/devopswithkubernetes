@@ -174,7 +174,7 @@ async fn main() {
     let state = AppState { db };
 
     let app = Router::new()
-        .route("/healthz", get(health_check))
+        .route("/", get(health_check))
         .route("/todos", get(get_todos).post(add_todo))
         .route("/todos/:id", put(update_todo))
         .with_state(state)
