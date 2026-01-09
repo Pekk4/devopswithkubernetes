@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - manifests/namespace.yaml
+  - manifests/gateway.yaml
+  - manifests/pingpong-log-app-pvc.yaml
+  - manifests/configmap.yaml
+  - manifests/deployment.yaml
+  - manifests/service.yaml
+  - manifests/http-route.yaml
+
+images:
+  - name: ghcr.io/pekk4/devopswithkubernetes-log_output
+    newTag: "4.1"

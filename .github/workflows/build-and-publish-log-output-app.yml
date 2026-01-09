@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
@@ -38,3 +38,17 @@ jobs:
         run: |
           IMAGE=ghcr.io/${{ env.REPO }}-log_output:${{ env.VERSION }}
           docker build -t $IMAGE -t ghcr.io/${{ env.REPO }}-log_output:latest --push ./log_output
+
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v2
+
+      - name: Set correct image
+        run: |
+          cd log_output
+          kustomize edit set image ghcr.io/pekk4/devopswithkubernetes-log_output=ghcr.io/pekk4/devopswithkubernetes-log_output:${{ env.VERSION }}
+
+      - name: Update kustomization.yaml
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: 'log_output/kustomization.yaml'
+          message: 'New version released ${{ env.VERSION }}'

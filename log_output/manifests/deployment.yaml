@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: log-app-writer
-          image: ghcr.io/pekk4/devopswithkubernetes-log_output:4.1
+          image: ghcr.io/pekk4/devopswithkubernetes-log_output
           imagePullPolicy: Always
           env:
             - name: ROLE
@@ -31,7 +31,7 @@ spec:
               memory: "64Mi"
               cpu: "50m"
         - name: log-app-server
-          image: ghcr.io/pekk4/devopswithkubernetes-log_output:4.1
+          image: ghcr.io/pekk4/devopswithkubernetes-log_output
           imagePullPolicy: Always
           volumeMounts:
             - name: log-output
