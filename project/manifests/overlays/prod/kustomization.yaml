@@ -10,8 +10,8 @@ namespace: prod-todo-app
 
 images:
 - name: BACKEND_IMAGE
-  newTag: 4.5.1
+  newTag: 4.5.2
 - name: FRONTEND_IMAGE
-  newTag: 4.5.1
+  newTag: 4.5.2
 - name: postgres
   newTag: "15"
