@@ -55,3 +55,5 @@
 - [4.7.](https://github.com/Pekk4/devopswithkubernetes/tree/4.7)
 - [4.8.](https://github.com/Pekk4/devopswithkubernetes/tree/4.8)
 - [4.9.](https://github.com/Pekk4/devopswithkubernetes/tree/4.9/)
+- [4.10.](https://github.com/Pekk4/devopswithkubernetes/tree/4.10/)
+  - Config repository for ArgoCD: [dvk-todoapp-config](https://github.com/Pekk4/dvk-todoapp-config)
