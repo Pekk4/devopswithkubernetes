@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'project/**'
+    tags:
+      - '*'
   workflow_dispatch:
 
 jobs:
