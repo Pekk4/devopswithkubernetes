@@ -1,4 +1,4 @@
-name: Build & Publish Todo Backend
+name: Build & Publish Todo App Backend
 
 on:
   push:

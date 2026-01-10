@@ -2,16 +2,16 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: todoapp-db-secret
-  namespace: project
 type: Opaque
 stringData:
+  # I know I know, I'm just a bit lazy here...
+  # In real envs I'd use solutions like Azure Key Vault or so for creds
   PG_URL: "postgres://todoapp:todoapp@todoapp-postgres:5432/todoapp?sslmode=disable"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: todo-backend
-  namespace: project
 spec:
   replicas: 1
   strategy:
@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
         - name: todo-backend
-          image: ghcr.io/pekk4/devopswithkubernetes-todo_backend
+          image: BACKEND_IMAGE
           imagePullPolicy: Always
           resources:
             requests:

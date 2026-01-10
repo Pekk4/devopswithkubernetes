@@ -1,0 +1,58 @@
+name: Build & Publish Todo App
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'project/**'
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Normalize repo name to lowercase
+        run: echo "REPO=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      
+      - name: Build & push backend image
+        run: |
+          IMAGE=ghcr.io/${{ env.REPO }}-todo_backend:${{ github.sha }}
+          docker build -t $IMAGE -t ghcr.io/${{ env.REPO }}-todo_backend:latest --push ./project/todo-backend
+          echo "BACKEND_IMAGE=$IMAGE" >> $GITHUB_ENV
+
+      - name: Build & push frontend image
+        run: |
+          IMAGE=ghcr.io/${{ env.REPO }}-todo_frontend:${{ github.sha }}
+          docker build -t $IMAGE -t ghcr.io/${{ env.REPO }}-todo_frontend:latest --push ./project/todo-frontend
+          echo "FRONTEND_IMAGE=$IMAGE" >> $GITHUB_ENV
+
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v2
+
+      - name: Update staging manifests
+        run: |
+          cd project/manifests/overlays/staging
+          kustomize edit set image BACKEND_IMAGE=${{ env.BACKEND_IMAGE }}
+          kustomize edit set image FRONTEND_IMAGE=${{ env.FRONTEND_IMAGE }}
+
+      - name: Commit to staging
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: 'project/manifests/overlays/staging/kustomization.yaml'
+          message: "New version published ${{ github.sha }}"

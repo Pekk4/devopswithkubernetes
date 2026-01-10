@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- namespace.yaml
+- ./../../base
+
+namespace: staging-todo-app
+
+images:
+- name: BACKEND_IMAGE
+  newTag: d69e98f19bcac0ddf95fd2a9e46525970713125b
+- name: FRONTEND_IMAGE
+  newTag: d69e98f19bcac0ddf95fd2a9e46525970713125b
+- name: postgres
+  newTag: "15"

@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: todo-app
-  namespace: project
 spec:
   replicas: 1
   strategy:
@@ -17,7 +16,7 @@ spec:
     spec:
       containers:
         - name: todo-app
-          image: ghcr.io/pekk4/devopswithkubernetes-todo_app
+          image: FRONTEND_IMAGE
           imagePullPolicy: Always
           env:
             - name: PORT

@@ -2,7 +2,6 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: postgres-backup-job-sa
-  namespace: project
   annotations:
     iam.gke.io/gcp-service-account: postgres-backup-sa@PROJECT_ID_PLACEHOLDER.iam.gserviceaccount.com
 ---
@@ -10,7 +9,6 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: backup-job-db-secret
-  namespace: project
 type: Opaque
 stringData:
   # I know I know, I'm just a bit lazy here...
@@ -23,7 +21,6 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: backup-postgres
-  namespace: project
 spec:
   schedule: "0 0 * * *"
   jobTemplate:
