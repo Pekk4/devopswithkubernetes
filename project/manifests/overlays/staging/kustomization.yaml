@@ -10,9 +10,9 @@ namespace: staging-todo-app
 images:
 - name: BACKEND_IMAGE
   newName: ghcr.io/pekk4/devopswithkubernetes-todo_backend
-  newTag: 9b2ba634df42d03514a2388b238896d83c97d5fd
+  newTag: 73e4a84c6eae5dcd1830b1ca9893005df18f4cd1
 - name: FRONTEND_IMAGE
   newName: ghcr.io/pekk4/devopswithkubernetes-todo_frontend
-  newTag: 9b2ba634df42d03514a2388b238896d83c97d5fd
+  newTag: 73e4a84c6eae5dcd1830b1ca9893005df18f4cd1
 - name: postgres
   newTag: "15"
