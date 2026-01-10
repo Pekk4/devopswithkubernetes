@@ -10,10 +10,8 @@ namespace: prod-todo-app
 
 images:
 - name: BACKEND_IMAGE
-  newName: ghcr.io/pekk4/devopswithkubernetes-todo_frontend
   newTag: 4.5.1
 - name: FRONTEND_IMAGE
-  newName: ghcr.io/pekk4/devopswithkubernetes-todo_backend
   newTag: 4.5.1
 - name: postgres
   newTag: "15"
